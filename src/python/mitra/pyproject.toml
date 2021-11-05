@@ -1,0 +1,13 @@
+[tool.poetry]
+name = "mitra"
+version = "0.1.0"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+"discord.py"="^1.7.3"
+youtube_dl="^2021.6.6"
+youtube-search="^2.1.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
