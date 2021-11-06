@@ -1,31 +1,35 @@
 import discord
 import asyncio
+from environs import logging
 import youtube_dl
 from youtube_search import YoutubeSearch
 from discord.ext import commands
-import os
-from os import environ
 
-#TOKEN = environ['DS_TOKEN']
+from mitra.config import DISCORD_TOKEN
+
+logger = logging.getLogger(__name__)
+
 FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
-TOKEN = ''
 client = commands.Bot(command_prefix= '.')
 pending_requests = []
 
-def play_next(ctx):
+def run(token):
+    client.run(token)
+
+async def play_next(ctx):
     if(ctx.voice_client != None):
         vc = ctx.voice_client
         if len(pending_requests) >= 1:
             obj = pending_requests[0]
             del pending_requests[0]
-            vc.play(discord.FFmpegPCMAudio(obj['URL'], **FFMPEG_OPTIONS), after=lambda e: play_next(ctx))
+            vc.play(discord.FFmpegPCMAudio(obj['URL'], **FFMPEG_OPTIONS), after=lambda e:    play_next(ctx))
             asyncio.run_coroutine_threadsafe(ctx.send("Now playing...\n**"+ obj['title'] +"**\n" + obj['video']), client.loop)
         else:
             asyncio.run_coroutine_threadsafe(ctx.send("**No more songs in queue.**"), client.loop)
 
 @client.event
 async def on_ready():
-    print('We have logged in as {0.user}'.format(client))
+    logger.info('We have logged in as {0.user}'.format(client))
 
 @client.command(pass_context=True)
 async def leave(ctx):
@@ -35,7 +39,7 @@ async def leave(ctx):
 @client.command(pass_context=True)
 async def play(ctx, *, url):
 
-    print (url)
+    logger.info (url)
 
     channel = ctx.message.author.voice.channel
     if ctx.voice_client == None:
@@ -98,4 +102,3 @@ async def list(ctx):
         result += '\n' + e['title']
     await ctx.send('\n**Pending:**\n' + result + '\n')
 
-client.run(TOKEN)
