@@ -1,6 +1,6 @@
+import logging
 import discord
 import asyncio
-from environs import logging
 import youtube_dl
 from youtube_search import YoutubeSearch
 from discord.ext import commands
