@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "mitra"
+version = "0.0.1"
+description = "MusIc TRack plAyer"
+authors = ["José Duarte", "Pedro Feiteira"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+"discord.py"="^1.7.3"
+youtube_dl="^2021.6.6"
+youtube-search="^2.1.0"
+environs = "^9.3.4"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

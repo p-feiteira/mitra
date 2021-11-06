@@ -1,0 +1,7 @@
+{
+    "python.envFile": "${workspaceFolder}/.env",
+    "python.languageServer": "Pylance",
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.completeFunctionParens": true,
+    "python.analysis.typeCheckingMode": "basic"
+}

@@ -1,3 +1,0 @@
-"discord.py">=1.7.3
-youtube_dl>=2021.6.6
-youtube-search>=2.1.0
