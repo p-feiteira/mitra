@@ -1,6 +1,6 @@
 import logging
 
-from mitra import bot
+from mitra.bot import run
 from mitra.config import DISCORD_TOKEN
 
 LOG_FORMAT = '[%(levelname)s] %(asctime)s %(name)s: %(message)s'
@@ -16,4 +16,4 @@ logging.basicConfig(
 )
 
 if __name__ == "__main__":
-    bot.run(DISCORD_TOKEN)
+    run(DISCORD_TOKEN)
