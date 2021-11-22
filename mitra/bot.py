@@ -18,21 +18,24 @@ e.g You might like to implement a vote before skipping the song or only allow ad
 Music bots require lots of work, and tuning. Goodluck.
 If you find any bugs feel free to ping me on discord. @Eviee#0666
 """
+from ast import Call
 import logging
+from typing import Callable
 import discord
 from discord.ext import commands
+from discord.ext.commands.context import Context
 
 import asyncio
 import itertools
 import sys
 import traceback
-from async_timeout import timeout
-from functools import partial
+from async_timeout import Any, timeout
+from functools import partial, wraps
 from discord.ext.commands.cog import Cog
 from discord.ext.commands.core import command
 from youtube_dl import YoutubeDL
 
-from mitra.config import COMMAND_PREFIX
+from mitra.config import COMMAND_PREFIX, TEXT_CHANNEL_WHITELIST
 
 
 ytdlopts = {
@@ -192,6 +195,10 @@ class MusicPlayer:
         """Disconnect and cleanup the player."""
         return self.bot.loop.create_task(self._cog.cleanup(guild))
 
+def channel_whitelist():
+    def predicate(ctx):
+        return str(ctx.channel) in TEXT_CHANNEL_WHITELIST
+    return commands.check(predicate)
 
 class Music(Cog):
     """Music related commands."""
@@ -244,6 +251,7 @@ class Music(Cog):
         return player
 
     @commands.command(name='connect', aliases=['join'])
+    @channel_whitelist()
     async def connect_(self, ctx, *, channel: discord.VoiceChannel=None):
         """Connect to voice.
 
@@ -279,6 +287,7 @@ class Music(Cog):
         await ctx.send(f'Connected to: **{channel}**', delete_after=20)
 
     @commands.command(name='play', aliases=['sing', "p"])
+    @channel_whitelist()
     async def play_(self, ctx, *, search: str):
         """Request a song and add it to the queue.
 
@@ -306,6 +315,7 @@ class Music(Cog):
         await player.queue.put(source)
 
     @commands.command(name='pause')
+    @channel_whitelist()
     async def pause_(self, ctx):
         """Pause the currently playing song."""
         vc = ctx.voice_client
@@ -319,6 +329,7 @@ class Music(Cog):
         await ctx.send(f'**`{ctx.author}`**: Paused the song!')
 
     @commands.command(name='resume')
+    @channel_whitelist()
     async def resume_(self, ctx):
         """Resume the currently paused song."""
         vc = ctx.voice_client
@@ -332,6 +343,7 @@ class Music(Cog):
         await ctx.send(f'**`{ctx.author}`**: Resumed the song!')
 
     @commands.command(name='skip')
+    @channel_whitelist()
     async def skip_(self, ctx):
         """Skip the song."""
         vc = ctx.voice_client
@@ -348,6 +360,7 @@ class Music(Cog):
         await ctx.send(f'**`{ctx.author}`**: Skipped the song!')
 
     @commands.command(name='queue', aliases=['q', 'playlist'])
+    @channel_whitelist()
     async def queue_info(self, ctx):
         """Retrieve a basic queue of upcoming songs."""
         vc = ctx.voice_client
@@ -368,6 +381,7 @@ class Music(Cog):
         await ctx.send(embed=embed)
 
     @commands.command(name='now_playing', aliases=['np', 'current', 'currentsong', 'playing'])
+    @channel_whitelist()
     async def now_playing_(self, ctx):
         """Display information about the currently playing song."""
         vc = ctx.voice_client
@@ -389,6 +403,7 @@ class Music(Cog):
                                    f'requested by `{vc.source.requester}`')
 
     @commands.command(name='volume', aliases=['vol'])
+    @channel_whitelist()
     async def change_volume(self, ctx, *, vol: float):
         """Change the player volume.
 
@@ -414,6 +429,7 @@ class Music(Cog):
         await ctx.send(f'**`{ctx.author}`**: Set the volume to **{vol}%**')
 
     @commands.command(name='stop')
+    @channel_whitelist()
     async def stop_(self, ctx):
         """Stop the currently playing song and destroy the player.
 
